@@ -45,13 +45,12 @@ void gets(char *ptr)
 	}
       else if (c == '\b')
 	{
-	  if (i > 0)
-	    {
+	      putc(c);
+	      putc(' ');
 	      putc(c);
 	      i--;
 	      ptr[i] = 0;
 	      i--;
-	    }
 	}
       else
 	{
