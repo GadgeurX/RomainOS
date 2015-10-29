@@ -38,6 +38,30 @@ int mod(int i, int j)
   return (i - ((i / j) * j) );
 }
 
+void putbase(int n, char *base)
+{
+  int i = 0;
+  char t[32];
+
+  if (n == 0)
+  {
+    putc(base[0]);
+    return;
+  }
+  if (n < 0)
+  {
+    putc('-');
+    n = -n;
+  }
+  while (n)
+  {
+    t[i++] = base[mod(n, strlen(base))];
+    n /= strlen(base);
+  }
+  t[i] = 0;
+  revput(t);
+}
+
 void putnbr(int nb)
 {
   int i = 0;

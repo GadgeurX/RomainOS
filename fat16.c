@@ -1,6 +1,7 @@
 #include "FileSystem.h"
 
 char sector[SECTOR_SIZE];
+dentry_t cdir = {0};
 
 #define ptrSector(s, p) (((dentry_t *)s) + p)
 
@@ -29,19 +30,16 @@ int end_value(int fstClus)
   return (b << 4) | ((a & 0xf0) >> 4);
 }
 
-int is_roote(dentry_t *entry)
+int is_root(dentry_t *entry)
 {
-  if (entry->fstClus == 0)
-    return (1);
-  else
-    return (0);
+  return (entry->fstClus == 0 ? 1 : 0);
 }
 
 int cd_dir(char *dirName)
 {
-  /*
   int j;
   int i = (is_root(cdir) ? 19 : cdir.fstClus + 31);
+  char *fileName;
 
   while (end_value(i) < THRESHOLD)
   {
@@ -49,37 +47,40 @@ int cd_dir(char *dirName)
     load_sectors(sector, i, 1);
     while (j < SECTOR_SIZE / sizeof(dentry_t))
     {
-      if (strcmp(ptrSector(sector, j)->name, dirName) == 0)//TODO check if empty
+      /*if (get_file_name(ptrSector(sector, j));
+      if (ptrSector(sector, j)->name[0] != 0 && strcmp(ptrSector(sector, j)->name, dirName) == 0)
       {
         cdir = *ptrSector(sector, j);
         return (1);
-      }
+      }*/
       ++j;
     }
     ++i;
-  }*/
+  }
   return (0);
 }
 
-void ls_dir(dentry_t *dir)
+void ls_dir()
 {
   int j;
-  int i;
-  if (is_roote(dir))
-    i = 19;
-  else
-    dir->fstClus + 31;
-  putnbr(dir->fstClus);
-  while (i < 33)
+  int i = (is_root(&cdir) ? 19 : cdir.fstClus + 31);
+  int clus = cdir.fstClus;
+
+  //while (i < 33)
+  while (end_value(clus) < THRESHOLD)//33 for the root
+  {
+    j = 0;
+    load_sectors(sector, i, 1);
+    while (j < SECTOR_SIZE / sizeof(dentry_t))
     {
-      j = 0;
-      load_sectors(sector, i, 1);
-      while (j < SECTOR_SIZE / sizeof(dentry_t))
-	{
-	  puts(ptrSector(sector, j)->name);
-	  puts("\n");
-	  ++j;
-	}
-      ++i;
-    }
+      if (ptrSector(sector, j)->name[0] != 0)
+      {
+        puts(ptrSector(sector, j)->name);
+        puts("\n");
+      }
+       ++j;
+	  }
+    clus = end_value(clus);
+    ++i;
+  }
 }
