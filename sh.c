@@ -9,16 +9,12 @@ char *g_commands[] = {
   (void *)0
 };
 
-dentry_t *get_entry()
-{
-  static dentry_t cdir = {0};
-  return (&cdir);
-}
+static dentry_t cdir = {0};
 
 int ls(void *nan)
 {
   (void)nan;
-  ls_dir(get_entry());
+  ls_dir(&cdir);
   return (1);
 }
 
@@ -67,6 +63,7 @@ int loop()
   int val;
   char buffer[512];
 
+  cdir.fstClus = 0;
   while (1)
   {
     puts("$>");

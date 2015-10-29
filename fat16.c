@@ -8,7 +8,7 @@ void memcpy(char *src, char *dst, int size)
 {
   int i = 0;
 
-  while (i != size)
+  while (i < size)
   {
     dst[i] = src[i];
     ++i;
@@ -29,9 +29,12 @@ int end_value(int fstClus)
   return (b << 4) | ((a & 0xf0) >> 4);
 }
 
-int is_root(dentry_t entry)
+int is_roote(dentry_t *entry)
 {
-  return (entry.fstClus == 0 ? 1 : 0);
+  if (entry->fstClus == 0)
+    return (1);
+  else
+    return (0);
 }
 
 int cd_dir(char *dirName)
@@ -61,20 +64,22 @@ int cd_dir(char *dirName)
 void ls_dir(dentry_t *dir)
 {
   int j;
-  int i = (is_root(*dir) ? 19 : dir->fstClus + 31);
-
+  int i;
+  if (is_roote(dir))
+    i = 19;
+  else
+    dir->fstClus + 31;
   putnbr(dir->fstClus);
-
-  while (end_value(i) < THRESHOLD)
-  {
-    j = 0;
-    load_sectors(sector, i, 1);
-    while (j < SECTOR_SIZE / sizeof(dentry_t))
+  while (i < 33)
     {
-      puts(ptrSector(sector, j)->name);
-      puts("\n");
-      ++j;
+      j = 0;
+      load_sectors(sector, i, 1);
+      while (j < SECTOR_SIZE / sizeof(dentry_t))
+	{
+	  puts(ptrSector(sector, j)->name);
+	  puts("\n");
+	  ++j;
+	}
+      ++i;
     }
-    ++i;
-  }
 }
