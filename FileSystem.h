@@ -17,4 +17,8 @@ typedef struct {
 }       dentry_t;
 #pragma pack()
 
+# define LEN_ROOT 33
+
+typedef int (*entry_func)(void *);
+
 #endif

@@ -35,52 +35,78 @@ int is_root(dentry_t *entry)
   return (entry->fstClus == 0 ? 1 : 0);
 }
 
-int cd_dir(char *dirName)
+int is_file(dentry_t *entry)
 {
-  int j;
-  int i = (is_root(cdir) ? 19 : cdir.fstClus + 31);
-  char *fileName;
-
-  while (end_value(i) < THRESHOLD)
-  {
-    j = 0;
-    load_sectors(sector, i, 1);
-    while (j < SECTOR_SIZE / sizeof(dentry_t))
-    {
-      /*if (get_file_name(ptrSector(sector, j));
-      if (ptrSector(sector, j)->name[0] != 0 && strcmp(ptrSector(sector, j)->name, dirName) == 0)
-      {
-        cdir = *ptrSector(sector, j);
-        return (1);
-      }*/
-      ++j;
-    }
-    ++i;
-  }
-  return (0);
+  return (entry->name[0] != 0);
 }
 
-void ls_dir()
+int execute_entry(entry_func function)
 {
   int j;
-  int i = (is_root(&cdir) ? 19 : cdir.fstClus + 31);
+  int i = cdir.fstClus + 31;
   int clus = cdir.fstClus;
 
-  //while (i < 33)
-  while (end_value(clus) < THRESHOLD)//33 for the root
+  if (is_root(&cdir))
+    return (execute_entry_root(function));
+  while (clus < THRESHOLD)
   {
     j = 0;
     load_sectors(sector, i, 1);
-    while (j < SECTOR_SIZE / sizeof(dentry_t))
+    for (j = 0; j < SECTOR_SIZE / sizeof(dentry_t); ++j)
     {
-      if (ptrSector(sector, j)->name[0] != 0)
-      {
-        puts(ptrSector(sector, j)->name);
-        puts("\n");
-      }
-       ++j;
-	  }
+      function(ptrSector(sector, j));
+    }
     clus = end_value(clus);
     ++i;
   }
+  return (1);
+}
+
+int execute_entry_root(entry_func function)
+{
+  int i = 19;
+  int j;
+
+  while (i < LEN_ROOT)
+  {
+    load_sectors(sector, i, 1);
+    for (j = 0; j < SECTOR_SIZE / sizeof(dentry_t); ++j)
+    {
+      function(ptrSector(sector, j));
+    }
+    ++i;
+  }
+  return (1);
+}
+
+int put_file(void *entry)
+{
+  if (is_file(entry))
+  {
+    puts(((dentry_t *)entry)->name);
+    puts("\n");
+  }
+}
+
+int enter_file(void *entry)
+{
+  if (is_file(entry))
+  {
+    if (strcmp(((dentry_t *)entry)->name, "DIR") == 0)
+    {
+      put_file(entry);
+    }
+  }
+}
+
+int cd_dir(char *dirName)
+{
+  execute_entry(enter_file);
+  return (1);
+}
+
+int ls_dir()
+{
+  execute_entry(put_file);
+  return (1);
 }
