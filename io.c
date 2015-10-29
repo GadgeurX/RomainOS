@@ -38,11 +38,26 @@ void gets(char *ptr)
   while (c != '\n' && c != '\r')
     {
       c = getc();
-      putc(c);
       if (c == '\r')
-	putc('\n');
+	{
+	  putc(c);
+	  putc('\n');
+	}
+      else if (c == '\b')
+	{
+	  if (i > 0)
+	    {
+	      putc(c);
+	      i--;
+	      ptr[i] = 0;
+	      i--;
+	    }
+	}
       else
-	ptr[i] = c;
+	{
+	  putc(c);
+	  ptr[i] = c;
+	}
       i++;
     }
   ptr[i] = 0;
