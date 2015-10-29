@@ -43,6 +43,11 @@ void putnbr(int nb)
   int i = 0;
   char t[12];
 
+  if (nb == 0)
+  {
+    putc('0');
+    return;
+  }
   if (nb < 0)
     {
       putc('-');
