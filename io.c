@@ -62,6 +62,7 @@ void gets(char *ptr)
 	}
       i++;
     }
+  ptr[i--] = 0;
   ptr[i] = 0;
  }
 
