@@ -33,11 +33,10 @@ int find_command(char *cmd)
 int handle_commandline(char *s)
 {
   int index;
-  func cmd[3];
+  func cmd[2];
 
   cmd[0] = ls;
   cmd[1] = poweroff;
-  cmd[2] = (void *)0;
   if ((index = find_command(s)) >= 0)
     return (cmd[index]());
   return (2);
