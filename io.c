@@ -26,7 +26,7 @@ void puts(char * s)
     {
       putc(*s);
       if (*s == '\n')
-	putc('\r'); 
+	putc('\r');
       s++;
     }
 }

@@ -29,7 +29,7 @@ void memcpy(char *src, char *dst, int size)
 void ls_dir()
 {
   int i = 19;
-  int j;  
+  int j;
 
   while (i < 33)
     {
@@ -41,7 +41,7 @@ void ls_dir()
 	    {
 	      puts((((dentry_t *)sector) + j)->name);
 	      puts("\n");
-	    }	
+	    }
 	  j++;
 	}
       i++;
