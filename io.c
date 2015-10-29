@@ -41,8 +41,33 @@ void gets(char *ptr)
       putc(c);
       if (c == '\r')
 	putc('\n');
-      ptr[i] = c;
+      else
+	ptr[i] = c;
       i++;
     }
   ptr[i] = 0;
  }
+
+void load_sectors(char * addr, int sector_no, char count)
+{
+  sector_no = sector_no;
+  asm "mov ax, cs";
+  asm "mov es, ax";
+  asm "mov bx, 4[bp]";
+  asm "push bx";
+  asm "mov ax, 6[bp]";
+  asm "mov bl, #18";
+  asm "div bl";
+  asm "inc ah";
+  asm "mov cl, ah";
+  asm "mov ch, al";
+  asm "shr ch, #1";
+  asm "mov dh, al";
+  asm "and dh, #1";
+  asm "mov dl, #1";
+  asm "pop bx";
+  asm "_load_sectors_redo: mov ah, #2";
+  asm "mov al, 8[bp]";
+  asm "int 0x13";
+  asm "jc _load_sectors_redo";
+}

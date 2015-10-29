@@ -1,5 +1,5 @@
 %define BASE   0x100  		; 0x0100:0x0 = 0x1000
-%define KSIZE  1  	; nombre de secteurs de 512 octets a charger
+%define KSIZE  4  	; nombre de secteurs de 512 octets a charger
 
 [BITS 16]
 [ORG 0x0]
