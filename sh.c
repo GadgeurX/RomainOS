@@ -35,7 +35,7 @@ int find_command(char *cmd)
 
   while (g_commands[i])//PROUT
   {
-    if (strcmp(cmd, g_commands[i]) == 0)
+    if (strncmp(cmd, g_commands[i], strlen(g_commands[i])) == 0)
       return (i);
     ++i;
   }
@@ -51,7 +51,7 @@ int handle_commandline(char *s)
   cmd[1] = poweroff;
   cmd[2] = cd;
   if ((index = find_command(s)) >= 0)
-    return (cmd[index]("DIR"));
+    return (cmd[index](s + 3));
   return (2);
 }
 
@@ -60,7 +60,7 @@ int loop()
 {
   int val;
   char buffer[512];
-
+  initFS();
   while (1)
   {
     puts("$>");

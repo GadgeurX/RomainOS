@@ -1,11 +1,17 @@
 #include "FileSystem.h"
 
 char sector[SECTOR_SIZE];
-dentry_t cdir = {0};
+static dentry_t cdir;
+char *buffer;
 
 #define ptrSector(s, p) (((dentry_t *)s) + p)
 
-void memcpy(char *src, char *dst, int size)
+void initFS()
+{
+  cdir.fstClus = 0;
+}
+
+void memcpy(char *dst, char *src, int size)
 {
   int i = 0;
 
@@ -66,7 +72,6 @@ int execute_entry_root(entry_func function)
 {
   int i = 19;
   int j;
-
   while (i < LEN_ROOT)
   {
     load_sectors(sector, i, 1);
@@ -92,15 +97,14 @@ int enter_file(void *entry)
 {
   if (is_file(entry))
   {
-    if (strcmp(((dentry_t *)entry)->name, "DIR") == 0)
-    {
-      put_file(entry);
-    }
+    if (strlen(buffer) > 0 && strncmp(((dentry_t *)entry)->name, buffer, strlen(buffer)) == 0)
+      cdir = *((dentry_t *)entry);
   }
 }
 
 int cd_dir(char *dirName)
 {
+  buffer = dirName;
   execute_entry(enter_file);
   return (1);
 }
