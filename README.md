@@ -1,2 +1,0 @@
-# RomainOS
-A Small Os

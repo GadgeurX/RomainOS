@@ -1,26 +1,44 @@
-SRCS	= src/main.c	\
-	  src/io.c	\
-	  src/string.c	\
-	  src/fat16.c
+CC	:= i686-elf-gcc
 
-ASM	= src/boot.asm
+ASM	:= nasm
 
-CC	= bcc
+RM	:= rm -rf
 
-OBJS	= $(SRCS:.c=.o)
+LDFLAGS	+= -lgcc -ffreestanding -O2 -nostdlib
 
-NAME	= kernel
+CFLAGS	+= -std=gnu99 -ffreestanding -O2 -Wall -Wextra -Iincludes
 
-$(NAME): all
+CSRCS	:= $(shell find srcs -type f -name "*.c")
 
-all: $(OBJS)
-	ld86 -d -M $(OBJS) -o $(NAME)
-	nasm -f bin -o boot $(ASM)
+ASRCS	:= $(shell find srcs -type f -name "*.asm")
+
+COBJS	:= $(CSRCS:.c=.o)
+
+AOBJS	:= $(ASRCS:.asm=.o)
+
+NAME	:= kernel.bin
+
+all: $(NAME)
+
+$(AOBJS):
+	for src in $(ASRCS); do \
+		$(ASM) -felf32 $$src; \
+	done
+
+$(NAME): $(COBJS) $(AOBJS)
+	$(CC) -T linker.ld -o $(NAME) $(COBJS) $(AOBJS) $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJS)
+	$(RM) $(COBJS) $(AOBJS)
 
 fclean: clean
-	rm -rf $(NAME)
+	$(RM) $(NAME)
+
+run:
+	/mnt/c/"Program Files"/qemu/qemu-system-i386.exe -kernel kernel.bin
 
 re: fclean all
+
+rerun: re run
+
+.PHONY: all re clean fclean
